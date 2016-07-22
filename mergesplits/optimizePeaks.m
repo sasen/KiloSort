@@ -38,10 +38,18 @@ if ~exist('spikes_merged')
     uBase = uBase(1:ncurr, :);
     spikes_merged = 1;
 end
-[~, itsort] = sort(nS, 'descend');
+[nS_sorted, itsort] = sort(nS, 'descend');
 
 %% initialize U
 Nfilt = ops.Nfilt;
+% check that Nfilt valid filters would exist
+minNfilt = min(size(find(nS_sorted(1:Nfilt)),1),Nfilt);
+if minNfilt < Nfilt
+    sprintf('Warning: optimizePeaks.m resetting Nfilt from %d to %d.\n',Nfilt,minNfilt)
+    Nfilt = minNfilt;
+    ops.Nfilt = minNfilt; 
+end
+
 lam = ops.lam(1) * ones(Nfilt, 1, 'single');
 
 U = gpuArray(uBase(itsort(1:Nfilt), :))';
