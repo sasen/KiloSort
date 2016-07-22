@@ -72,6 +72,11 @@ ops.ForceMaxRAMforDat   = 20e9; % maximum RAM the algorithm will try to use; on 
 %% 
 tic; % start timer
 
+if ops.GPU
+     % initialize GPU (will erase any existing GPU arrays)
+    gpuDevice(1);
+end
+
 if strcmp(ops.datatype , 'openEphys')
    ops = convertOpenEphysToRawBInary(ops);  % convert data, only for OpenEphys
 end
@@ -80,10 +85,10 @@ end
 
 if strcmp(ops.initialize, 'fromData')
     % do scaled kmeans to initialize the algorithm (not sure if functional yet for CPU)
-    optimizePeaks(uproj);
+    optimizePeaks;
 end
 %
-[rez] = fitTemplates(ops, rez, DATA); 
+[rez] = fitTemplates(ops, rez, DATA, WUinit); 
 
 %
 % extracts final spike times (overlapping extraction)
